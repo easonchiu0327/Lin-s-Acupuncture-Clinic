@@ -535,7 +535,7 @@
         <div class="section-body">
 
           <div class="about-portrait">
-            <img src="./Owner's picture.jpg" alt="Dr. Miaoguang Lin standing in the clinic" />
+            <img src="./owners-picture.jpg" alt="Dr. Miaoguang Lin standing in the clinic" />
           </div>
 
           <h3>Dr.Miaoguang Lin（Dr.Ac; T.C.M)</h3>
@@ -881,46 +881,42 @@
     }
 
     // Contact Form Handler
+    // Default behavior: open user's email client via mailto: so no server credentials are required.
+    // This avoids needing the clinic's SMTP password while still letting users send messages.
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-      contactForm.addEventListener('submit', async function(e) {
+      contactForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const name = document.getElementById('name').value.trim();
         const email = document.getElementById('email').value.trim();
         const message = document.getElementById('message').value.trim();
         const statusEl = document.getElementById('form-status');
-        
+
         if (!name || !email || !message) {
           statusEl.textContent = 'Please fill in all fields.';
           statusEl.className = 'form-status error';
           return;
         }
 
-        try {
-          const response = await fetch('/api/send-email', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, email, message })
-          });
+        // Compose mailto link
+        const clinicEmail = 'lin5002223@gmail.com';
+        const subject = encodeURIComponent(`Website message from ${name}`);
+        const bodyLines = [
+          `Name: ${name}`,
+          `Email: ${email}`,
+          '',
+          message
+        ];
+        const body = encodeURIComponent(bodyLines.join('\n'));
 
-          const result = await response.json();
+        // Open user's default mail client with prefilled to/subject/body
+        const mailto = `mailto:${clinicEmail}?subject=${subject}&body=${body}`;
+        window.location.href = mailto;
 
-          if (response.ok) {
-            statusEl.textContent = 'Email sent successfully! We will get back to you soon.';
-            statusEl.className = 'form-status success';
-            contactForm.reset();
-          } else {
-            statusEl.textContent = result.message || 'Failed to send email. Please try again.';
-            statusEl.className = 'form-status error';
-          }
-        } catch (error) {
-          statusEl.textContent = 'Error sending email. Please try again later.';
-          statusEl.className = 'form-status error';
-          console.error('Error:', error);
-        }
+        // Show a small success hint (client will open mail app)
+        statusEl.textContent = 'Your email client should open. Send the email to complete.';
+        statusEl.className = 'form-status success';
       });
     }
 
