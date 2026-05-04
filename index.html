@@ -180,6 +180,42 @@
     tr:last-child td { border-bottom: none; }
 
     /* ============================================================
+       GOOGLE MAPS EMBED
+    ============================================================ */
+    .map-container {
+      width: 100%;
+      height: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+      margin: 1.2rem 0;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .location-info {
+      background: #f4f8f4;
+      border-radius: 6px;
+      padding: 0.9rem 1rem;
+      margin-top: 1rem;
+      border-left: 4px solid var(--color-accent);
+    }
+    .location-info strong {
+      color: var(--color-primary);
+      display: block;
+      margin-bottom: 0.4rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .location-info p {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    /* ============================================================
        REVIEW CARDS
     ============================================================ */
     .review-card {
@@ -305,6 +341,110 @@
       .tab { min-width: 84px; padding: 0.55rem 0.75rem; font-size: 0.9rem; }
     }
 
+    /* --- Contact Form --- */
+    .contact-form {
+      max-width: 500px;
+      margin: 1.5rem auto;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--color-text);
+      background-color: #fff;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(90, 122, 90, 0.1);
+    }
+
+    .btn-send {
+      background-color: var(--color-primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+    }
+
+    .btn-send:hover {
+      background-color: #4a6a4a;
+    }
+
+    .btn-send:active {
+      transform: scale(0.98);
+    }
+
+    .form-status {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+
+    .form-status.success {
+      background-color: #d4edda;
+      color: #155724;
+      display: block;
+    }
+
+    .form-status.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      display: block;
+    }
+
+    /* --- FAQ Styles --- */
+    .faq-item {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-item h4 {
+      color: var(--color-primary);
+      font-size: 1.1rem;
+      margin: 0 0 0.75rem 0;
+      font-weight: 600;
+    }
+
+    .faq-item p {
+      margin: 0;
+      line-height: 1.6;
+      color: var(--color-text);
+    }
+
     /* --- Footer --- */
     footer {
       text-align: center;
@@ -337,37 +477,55 @@
       <button id="tab-what-is-acupuncture" class="tab" data-target="what-is-acupuncture" role="tab">What is acupuncture</button>
       <button id="tab-reviews" class="tab" data-target="reviews" role="tab">Reviews</button>
       <button id="tab-contact" class="tab" data-target="contact" role="tab">Contact</button>
+      <button id="tab-faq" class="tab" data-target="faq" role="tab">FAQ</button>
     </div>
 
     <div class="tab-panels">
       <section id="home" class="tab-panel active" role="tabpanel" aria-labelledby="tab-home">
         <div class="section-body">
 
-          <p>
-            Welcome to Lin's Acupuncture Clinic. We offer authentic Traditional
-            Chinese Medicine treatments in a calm, professional setting in the
-            heart of Saskatoon. Dr. Miaoguang Lin brings over 34 years of clinical
-            experience to every appointment.
-          </p>
-          <p>
-            Direct billing is available. SGI and most major insurance companies
-            cover acupuncture treatment — no referral needed.
-          </p>
+          <div class="contact-item" style="margin-bottom: 1rem;">
+            <strong>Phone</strong>
+            <a href="tel:+13065002223">+13065002223</a>
+          </div>
 
-          <!-- Quick-glance hours — keep in sync with the Contact section below -->
-          <h3>Hours of Operation</h3>
+          <div class="contact-item" style="margin-bottom: 1.5rem;">
+            <strong>Email</strong>
+            <a href="mailto:lin5002223@gmail.com">lin5002223@gmail.com</a>
+          </div>
+
+          <h3>Operation Hour</h3>
           <div class="table-responsive">
           <table>
             <thead>
               <tr><th>Day</th><th>Hours</th></tr>
             </thead>
             <tbody>
-              <!-- Edit these rows to update hours -->
-              <tr><td>Monday – Friday</td><td>10:00 AM – 5:30 PM</td></tr>
-              <tr><td>Saturday</td>       <td>11:00 AM – 5:30 PM</td></tr>
-              <tr><td>Sunday</td>         <td>Closed</td></tr>
+              <tr><td>Sunday</td><td>Closed</td></tr>
+              <tr><td>Monday</td><td>10:00 AM – 5:00 PM</td></tr>
+              <tr><td>Tuesday</td><td>10:00 AM – 5:00 PM</td></tr>
+              <tr><td>Wednesday</td><td>10:00 AM – 5:00 PM</td></tr>
+              <tr><td>Thursday</td><td>10:00 AM – 5:00 PM</td></tr>
+              <tr><td>Friday</td><td>10:00 AM – 5:00 PM</td></tr>
+              <tr><td>Saturday</td><td>10:00 AM – 5:00 PM</td></tr>
             </tbody>
           </table>
+          </div>
+
+          <div class="contact-item" style="margin-top: 1.5rem; margin-bottom: 1rem;">
+            <strong>Google Map</strong>
+            <a href="https://maps.app.goo.gl/axDRVuezE6ipoQJw6" target="_blank" rel="noopener">
+              Open location in Google Maps
+            </a>
+          </div>
+
+          <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2524.9523937547217!2d-106.67000732349122!3d52.13319907198755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x530c3cd4b3f4f4f5%3A0x5a5a5a5a5a5a5a5a!2sLin's%20Acupuncture%20Clinic!5e0!3m2!1sen!2sca!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+
+          <div class="location-info">
+            <strong>Location</strong>
+            <p>1120 8 St E, Saskatoon, SK S7H 0S4</p>
           </div>
 
         </div>
@@ -521,46 +679,53 @@
       <section id="contact" class="tab-panel" role="tabpanel" aria-labelledby="tab-contact">
         <div class="section-body">
 
-          <div class="contact-grid">
-
-            <div class="contact-item">
-              <strong>Cell</strong>
-              <a href="tel:3062220134">306-222-0134</a>
+          <h3>Send us a Message</h3>
+          <form id="contact-form" class="contact-form">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" id="name" name="name" required>
             </div>
 
-            <div class="contact-item">
-              <strong>Telephone</strong>
-              <a href="tel:3065002223">306-500-2223</a>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" required>
             </div>
 
-            <div class="contact-item">
-              <strong>Email</strong>
-              <a href="mailto:lin5002223@gmail.com">lin5002223@gmail.com</a>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="6" required></textarea>
             </div>
 
-            <div class="contact-item">
-              <strong>Address</strong>
-              <a href="https://maps.google.com/?q=1120+8th+Street+East,+Saskatoon,+SK"
-                 target="_blank" rel="noopener">
-                1120 8th Street East<br />
-                Saskatoon, SK  S7H 0S4
-              </a>
-            </div>
+            <button type="submit" class="btn-send">Send Email</button>
+            <div id="form-status" class="form-status"></div>
+          </form>
 
+        </div>
+      </section>
+
+      <section id="faq" class="tab-panel" role="tabpanel" aria-labelledby="tab-faq">
+        <div class="section-body">
+
+          <h3>Frequently Asked Questions</h3>
+
+          <div class="faq-item">
+            <h4>What sets you apart from other acupuncture clinics?</h4>
+            <p>I have more than 34+ years of work experience. My primary concern is alleviating pain for my patients. I have extensive clinical experience and am proficient in trauma surgery, orthopedics, and acupuncture therapy. I specialize in the analysis, diagnosis, and acupuncture treatment of various conditions, including pain, anxiety disorders, smoking cessation, and common warts. I skillfully combine acupuncture, massage, and all major integrative treatment methods of traditional Chinese medicine to develop unique treatments for both common health issues and rare, complex diseases. I create personalized, comprehensive plans that address not only symptoms but also the root cause of diseases.</p>
           </div>
 
-          <h3>Hours of Operation</h3>
-          <div class="table-responsive">
-          <table>
-            <thead>
-              <tr><th>Day</th><th>Hours</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Monday – Friday</td><td>10:00 AM – 5:30 PM</td></tr>
-              <tr><td>Saturday</td>       <td>11:00 AM – 5:30 PM</td></tr>
-              <tr><td>Sunday</td>         <td>Closed</td></tr>
-            </tbody>
-          </table>
+          <div class="faq-item">
+            <h4>Is acupuncture covered by my insurance plan?</h4>
+            <p>If your insurance plan covers acupuncture, you may get part or all of the visit covered. Check with your insurance provider to find out what level of coverage you have.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>How many treatments are needed?</h4>
+            <p>Typically patients report feeling better after 3 to 6 treatments. However, this can vary between individuals – with some requiring more treatments and others less treatments to get rid of pain or other symptoms.</p>
+          </div>
+
+          <div class="faq-item">
+            <h4>Can acupuncture sometimes be uncomfortable or painful?</h4>
+            <p>Some people feel a little stinging when the needle goes in. However, once the needle is in, they feel very relaxed and comfortable. Many patients even fall asleep during the treatment.</p>
           </div>
 
         </div>
@@ -715,8 +880,53 @@
       document.head.appendChild(script);
     }
 
+    // Contact Form Handler
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const message = document.getElementById('message').value.trim();
+        const statusEl = document.getElementById('form-status');
+        
+        if (!name || !email || !message) {
+          statusEl.textContent = 'Please fill in all fields.';
+          statusEl.className = 'form-status error';
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ name, email, message })
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            statusEl.textContent = 'Email sent successfully! We will get back to you soon.';
+            statusEl.className = 'form-status success';
+            contactForm.reset();
+          } else {
+            statusEl.textContent = result.message || 'Failed to send email. Please try again.';
+            statusEl.className = 'form-status error';
+          }
+        } catch (error) {
+          statusEl.textContent = 'Error sending email. Please try again later.';
+          statusEl.className = 'form-status error';
+          console.error('Error:', error);
+        }
+      });
+    }
+
     loadGoogleMapsPlaces();
   });
+
   </script>
 
 </body>
