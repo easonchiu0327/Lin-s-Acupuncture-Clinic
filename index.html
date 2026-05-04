@@ -182,6 +182,32 @@
       color: var(--color-muted);
       font-style: italic;
     }
+    .review-summary {
+      background: #f3f8f3;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      margin-bottom: 1rem;
+      color: var(--color-text);
+    }
+    .review-summary strong {
+      color: var(--color-primary);
+      font-size: 1.05rem;
+    }
+    .review-source-link {
+      display: inline-block;
+      margin-top: 0.4rem;
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .review-source-link:hover { text-decoration: underline; }
+    .review-loading,
+    .review-error {
+      color: var(--color-muted);
+      font-size: 0.92rem;
+      margin-bottom: 1rem;
+    }
 
     /* ============================================================
        PROCEDURE TAGS  (pill badges for the list of conditions)
@@ -334,30 +360,28 @@
       <section id="about" class="tab-panel" role="tabpanel" aria-labelledby="tab-about">
         <div class="section-body">
 
-          <h3>Dr. Miaoguang Lin — Dr.Ac; T.C.M</h3>
-          <p>
-            Dr. Lin is a registered acupuncturist and Traditional Chinese Medicine
-            practitioner licensed in Saskatchewan and Canada. With over
-            <strong>34 years of clinical experience</strong>, he combines
-            classical TCM knowledge with a rigorous medical background.
-          </p>
-          <p>
-            He graduated from a Chinese medical university in 1990 and spent years
-            as a trauma surgeon in municipal hospitals across Guangdong Province
-            before dedicating his practice entirely to TCM and acupuncture.
-          </p>
-          <p>
-            Dr. Lin established his Saskatoon clinic in 2015 and has since served
-            patients from across Saskatchewan seeking natural, evidence-informed
-            care.
-          </p>
-
-          <!-- Professional memberships — add or remove <li> items as needed -->
-          <h3>Professional Memberships</h3>
+          <h3>Dr.Miaoguang Lin（Dr.Ac; T.C.M)</h3>
           <ul>
-            <li>Chinese Medicine and Acupuncture Association of Canada</li>
-            <li>Saskatchewan Acupuncture Association</li>
+            <li>Registered acupuncturist and Chinese medicine practitioner in Saskatchewan and Canada.</li>
+            <li>Attending Trauma Surgeon in China.</li>
+            <li>Graduated from Medical University in China in 1990, and worked as a practicing physician in trauma surgery of Chinese and Western medicine in municipal hospitals in Guangdong Province, China.</li>
+            <li>Over 34+ years of work experience.</li>
+            <li>Proficient in trauma surgery, orthopedics, and acupuncture therapy, and has long served as a mentor for intern doctors in China.</li>
           </ul>
+
+          <h3>Practicing Experience</h3>
+          <p>
+            Rich clinical experience. Good at analysis, diagnosis and acupuncture treatment of various diseases, such as pain, anxiety disorder, quit smoking, verruca vulgaris etc.
+          </p>
+          <p>
+            Dr.Lin has developed unique treatment methods for general health issues, as well as rare and complicated diseases, by artfully combining all major TCM treatment methods including acupuncture, Tui-na and herbal medicine. In order to create a personalized and comprehensive plan that addresses both the symptoms and the root of the disease, Dr.Lin goes beyond traditional evaluation methods and takes into account a patient's living environment, constitution, state of mind, and seasonal changes that can affect his or her health. Dr.Lin's strong specialties are orthopedics/pain-management, as well as internal and gynecological diseases.
+          </p>
+          <p>
+            Dr. Lin is a recognized member of both the Chinese Medicine and Acupuncture Association of Canada and the Saskatchewan Acupuncture Association.
+          </p>
+          <p>
+            Lin's acupuncture clinic has been established in Saskatoon since 2015.
+          </p>
 
         </div>
       </section>
@@ -408,39 +432,20 @@
         <div class="section-body">
 
           <p style="color: var(--color-muted); font-size:0.9rem; margin-bottom:1rem;">
-            Here is what our patients are saying about their experience at Lin's
-            Acupuncture Clinic.
+            Live Google review snapshot for Lin's Acupuncture Clinic.
           </p>
 
-          <div class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>
-              "Dr. Lin is truly exceptional. After years of chronic back pain and
-              trying many treatments, just a few sessions with him have made a
-              remarkable difference. His expertise and care are unmatched."
-            </p>
-            <div class="author">— Google Review</div>
+          <div id="reviews-summary" class="review-summary">
+            <div class="review-loading">Loading latest Google rating and reviews...</div>
           </div>
 
-          <div class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>
-              "I came in for help quitting smoking and the laser auricular
-              acupuncture worked wonderfully. The clinic is clean, welcoming, and
-              Dr. Lin is very knowledgeable and reassuring."
-            </p>
-            <div class="author">— Google Review</div>
-          </div>
+          <div id="reviews-list"></div>
 
-          <div class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>
-              "Highly recommend Lin's Acupuncture Clinic. Dr. Lin's background as
-              a trauma surgeon combined with his TCM training gives you real
-              confidence. My migraines have reduced significantly."
-            </p>
-            <div class="author">— Google Review</div>
-          </div>
+          <p id="reviews-error" class="review-error" hidden>
+            Unable to load live Google reviews at the moment.
+          </p>
+
+          <div id="google-places-host" style="width:1px; height:1px; overflow:hidden; position:absolute; left:-9999px;"></div>
 
         </div>
       </section>
@@ -524,6 +529,125 @@
     tabs.forEach(t => t.addEventListener('click', () => activate(t.dataset.target)));
     const initial = document.querySelector('.tab.active')?.dataset.target || (tabs[0] && tabs[0].dataset.target);
     if (initial) activate(initial);
+
+    const googlePlaceUrl = 'https://maps.app.goo.gl/6SBhaCg7c8teawhi9';
+    const placeTextQuery = "Lin's Acupuncture Clinic Saskatoon";
+    const maxReviews = 3;
+    const apiKey = (window.LIN_CLINIC_GOOGLE_MAPS_KEY || '').trim();
+
+    const summaryEl = document.getElementById('reviews-summary');
+    const listEl = document.getElementById('reviews-list');
+    const errorEl = document.getElementById('reviews-error');
+
+    function toStarText(score) {
+      const rounded = Math.round(Number(score) || 0);
+      return '★★★★★'.slice(0, rounded) + '☆☆☆☆☆'.slice(0, 5 - rounded);
+    }
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderReviewSummary(rating, total, sourceUrl) {
+      summaryEl.innerHTML = [
+        '<strong>' + escapeHtml(Number(rating).toFixed(1)) + ' ' + toStarText(rating) + '</strong>',
+        '<div>' + escapeHtml(String(total)) + ' total Google reviews</div>',
+        '<a class="review-source-link" href="' + escapeHtml(sourceUrl) + '" target="_blank" rel="noopener">Read all reviews on Google Maps</a>'
+      ].join('');
+    }
+
+    function renderReviewCards(reviews) {
+      if (!reviews.length) {
+        listEl.innerHTML = '<p class="review-loading">No recent public reviews were returned.</p>';
+        return;
+      }
+
+      listEl.innerHTML = reviews.map(function(review) {
+        const stars = toStarText(review.rating);
+        const author = escapeHtml(review.author_name || 'Google Review');
+        const text = escapeHtml(review.text || '');
+        const relative = review.relative_time_description ? ' - ' + escapeHtml(review.relative_time_description) : '';
+        return [
+          '<div class="review-card">',
+          '  <div class="stars">' + stars + '</div>',
+          '  <p>"' + text + '"</p>',
+          '  <div class="author">- ' + author + relative + '</div>',
+          '</div>'
+        ].join('');
+      }).join('');
+    }
+
+    function showError(message) {
+      if (message) errorEl.textContent = message;
+      errorEl.hidden = false;
+    }
+
+    function loadGoogleMapsPlaces() {
+      if (!apiKey) {
+        summaryEl.innerHTML = [
+          '<strong>Google reviews are ready to connect.</strong>',
+          '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
+          '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
+        ].join('');
+        return;
+      }
+
+      window.initGoogleReviews = function() {
+        const host = document.getElementById('google-places-host');
+        const map = new google.maps.Map(host, { center: { lat: 52.1332, lng: -106.6700 }, zoom: 12 });
+        const service = new google.maps.places.PlacesService(map);
+
+        service.findPlaceFromQuery(
+          {
+            query: placeTextQuery,
+            fields: ['place_id', 'name']
+          },
+          function(placeResults, placeStatus) {
+            if (placeStatus !== google.maps.places.PlacesServiceStatus.OK || !placeResults || !placeResults.length) {
+              showError('Unable to find the clinic listing on Google Maps right now.');
+              return;
+            }
+
+            service.getDetails(
+              {
+                placeId: placeResults[0].place_id,
+                fields: ['name', 'rating', 'user_ratings_total', 'reviews', 'url']
+              },
+              function(place, detailStatus) {
+                if (detailStatus !== google.maps.places.PlacesServiceStatus.OK || !place) {
+                  showError('Unable to load live Google reviews right now.');
+                  return;
+                }
+
+                const rating = Number(place.rating || 0);
+                const total = Number(place.user_ratings_total || 0);
+                const sourceUrl = place.url || googlePlaceUrl;
+                const reviews = Array.isArray(place.reviews) ? place.reviews.slice(0, maxReviews) : [];
+
+                renderReviewSummary(rating, total, sourceUrl);
+                renderReviewCards(reviews);
+              }
+            );
+          }
+        );
+      };
+
+      const script = document.createElement('script');
+      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(apiKey) + '&libraries=places&callback=initGoogleReviews';
+      script.async = true;
+      script.defer = true;
+      script.onerror = function() {
+        showError('Google Maps script failed to load. Please verify the API key and API restrictions.');
+      };
+      document.head.appendChild(script);
+    }
+
+    loadGoogleMapsPlaces();
   });
   </script>
 
