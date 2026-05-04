@@ -11,8 +11,5 @@
       "src": "/(.*)",
       "dest": "api/serve.js"
     }
-  ],
-  "env": {
-    "LIN_CLINIC_GOOGLE_MAPS_KEY": "@lin_clinic_google_maps_key"
-  }
+  ]
 }
