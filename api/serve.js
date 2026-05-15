@@ -13,6 +13,33 @@ function escapeHtml(text) {
 }
 
 export default async function handler(req, res) {
+  // Serve static assets first (images, css, js, etc.)
+  if (req.method === 'GET' && req.url && req.url !== '/' && !req.url.includes('/api/')) {
+    const requestPath = req.url.split('?')[0].split('#')[0];
+    const safePath = path.normalize(requestPath).replace(/^([\/\\])+/, '');
+    const filePath = path.resolve(process.cwd(), safePath);
+    const rootPath = path.resolve(process.cwd());
+
+    if (filePath.startsWith(rootPath) && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      const contentTypes = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml',
+        '.ico': 'image/x-icon',
+        '.css': 'text/css; charset=utf-8',
+        '.js': 'text/javascript; charset=utf-8'
+      };
+
+      res.setHeader('Content-Type', contentTypes[ext] || 'application/octet-stream');
+      res.send(fs.readFileSync(filePath));
+      return;
+    }
+  }
+
   // Handle email endpoint
   if (req.method === 'POST' && req.url === '/api/send-email') {
     try {
