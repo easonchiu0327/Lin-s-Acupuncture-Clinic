@@ -266,6 +266,27 @@
       margin-bottom: 1rem;
     }
 
+    .best-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.1rem;
+      border-radius: 999px;
+      border: 2px solid var(--color-primary);
+      background: var(--color-primary);
+      color: #fff;
+      font-weight: bold;
+      text-decoration: none;
+      min-height: 44px;
+      box-shadow: 0 6px 14px rgba(90, 122, 90, 0.18);
+      transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
+    }
+    .best-link:hover {
+      background: var(--color-accent);
+      box-shadow: 0 8px 18px rgba(90, 122, 90, 0.22);
+    }
+    .best-link:active { transform: scale(0.98); }
+
     .about-emphasis {
       margin-top: 1.2rem;
       padding: 1rem 1.1rem;
@@ -637,7 +658,7 @@
           </p>
 
           <p>
-            <a class="review-source-link" href="https://threebestrated.ca/acupuncture-in-saskatoon-sk" target="_blank" rel="noopener">
+            <a class="review-source-link best-link" href="https://threebestrated.ca/acupuncture-in-saskatoon-sk" target="_blank" rel="noopener">
               The Best Acupuncture in Saskatoon, SK
             </a>
           </p>
