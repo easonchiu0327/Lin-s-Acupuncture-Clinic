@@ -817,11 +817,7 @@
     if (initial) activate(initial);
 
     const googlePlaceUrl = 'https://maps.app.goo.gl/6SBhaCg7c8teawhi9';
-    const placeTextQuery = "Lin's Acupuncture Clinic Saskatoon";
     const maxReviews = 5;
-    const apiKey = (window.LIN_CLINIC_GOOGLE_MAPS_KEY || '').trim();
-    const reviewCacheKey = 'linReviewsCacheV1';
-    const reviewCacheTTL = 24 * 60 * 60 * 1000;
 
     const reviewTargets = [
       {
@@ -837,41 +833,6 @@
     ].filter(function(target) {
       return target.summaryEl && target.listEl && target.errorEl;
     });
-
-    function getReviewCache() {
-      try {
-        const raw = localStorage.getItem(reviewCacheKey);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.timestamp || !parsed.data) return null;
-        return parsed;
-      } catch (err) {
-        return null;
-      }
-    }
-
-    function setReviewCache(data) {
-      try {
-        localStorage.setItem(reviewCacheKey, JSON.stringify({
-          timestamp: Date.now(),
-          data: data
-        }));
-      } catch (err) {
-        // Ignore cache errors (private mode, storage limits)
-      }
-    }
-
-    function scheduleNextRefresh(delayMs) {
-      if (!apiKey) return;
-      const delay = Math.max(delayMs || reviewCacheTTL, 0);
-      window.setTimeout(function() {
-        if (typeof window.initGoogleReviews === 'function') {
-          window.initGoogleReviews();
-        } else {
-          loadGoogleMapsPlaces();
-        }
-      }, delay);
-    }
 
     function toStarText(score) {
       const rounded = Math.round(Number(score) || 0);
@@ -921,111 +882,33 @@
       target.errorEl.hidden = false;
     }
 
-    function renderFromData(data) {
-      if (!data) return;
-      reviewTargets.forEach(function(target) {
-        renderReviewSummary(target, data.rating, data.total, data.sourceUrl);
-        renderReviewCards(target, data.reviews || []);
-      });
-    }
-
-    function loadGoogleMapsPlaces() {
-      const cached = getReviewCache();
-      const cacheAge = cached ? (Date.now() - cached.timestamp) : null;
-      const cacheFresh = cached && cacheAge < reviewCacheTTL;
-
-      if (cached && cached.data) {
-        renderFromData(cached.data);
-      }
-
-      if (!apiKey) {
-        if (!cached) {
-          reviewTargets.forEach(function(target) {
-            target.summaryEl.innerHTML = [
-              '<strong>Google reviews are ready to connect.</strong>',
-              '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
-              '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
-            ].join('');
-            target.listEl.innerHTML = '';
-            target.errorEl.hidden = true;
-          });
-        }
-        return;
-      }
-
-      if (cacheFresh) {
-        scheduleNextRefresh(reviewCacheTTL - cacheAge);
-        return;
-      }
-
-      window.initGoogleReviews = function() {
-        const host = document.getElementById('google-places-host');
-        const map = new google.maps.Map(host, { center: { lat: 52.1332, lng: -106.6700 }, zoom: 12 });
-        const service = new google.maps.places.PlacesService(map);
-
-        service.findPlaceFromQuery(
-          {
-            query: placeTextQuery,
-            fields: ['place_id', 'name']
-          },
-          function(placeResults, placeStatus) {
-            if (placeStatus !== google.maps.places.PlacesServiceStatus.OK || !placeResults || !placeResults.length) {
-              reviewTargets.forEach(function(target) {
-                showError(target, 'Unable to find the clinic listing on Google Maps right now.');
-              });
-              return;
-            }
-
-            service.getDetails(
-              {
-                placeId: placeResults[0].place_id,
-                fields: ['name', 'rating', 'user_ratings_total', 'reviews', 'url']
-              },
-              function(place, detailStatus) {
-                if (detailStatus !== google.maps.places.PlacesServiceStatus.OK || !place) {
-                  reviewTargets.forEach(function(target) {
-                    showError(target, 'Unable to load live Google reviews right now.');
-                  });
-                  return;
-                }
-
-                const rating = Number(place.rating || 0);
-                const total = Number(place.user_ratings_total || 0);
-                const sourceUrl = place.url || googlePlaceUrl;
-                const rawReviews = Array.isArray(place.reviews) ? place.reviews.slice() : [];
-                rawReviews.sort(function(a, b) {
-                  return (b.time || 0) - (a.time || 0);
-                });
-                const reviews = rawReviews.slice(0, maxReviews);
-                const payload = {
-                  rating: rating,
-                  total: total,
-                  sourceUrl: sourceUrl,
-                  reviews: reviews
-                };
-
-                reviewTargets.forEach(function(target) {
-                  renderReviewSummary(target, payload.rating, payload.total, payload.sourceUrl);
-                  renderReviewCards(target, payload.reviews);
-                });
-                setReviewCache(payload);
-                scheduleNextRefresh(reviewCacheTTL);
-              }
-            );
+    function loadReviews() {
+      fetch('/api/reviews')
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('Failed to load reviews');
           }
-        );
-      };
+          return response.json();
+        })
+        .then(function(data) {
+          if (!data || !data.place) {
+            throw new Error('Missing review data');
+          }
+          const rating = Number(data.place.rating || 0);
+          const total = Number(data.place.total || 0);
+          const sourceUrl = data.place.url || googlePlaceUrl;
+          const reviews = Array.isArray(data.reviews) ? data.reviews.slice(0, maxReviews) : [];
 
-      const script = document.createElement('script');
-      script.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(apiKey) + '&libraries=places&callback=initGoogleReviews';
-      script.async = true;
-      script.defer = true;
-      script.onerror = function() {
-        reviewTargets.forEach(function(target) {
-          showError(target, 'Google Maps script failed to load. Please verify the API key and API restrictions.');
+          reviewTargets.forEach(function(target) {
+            renderReviewSummary(target, rating, total, sourceUrl);
+            renderReviewCards(target, reviews);
+          });
+        })
+        .catch(function() {
+          reviewTargets.forEach(function(target) {
+            showError(target, 'Unable to load live Google reviews right now.');
+          });
         });
-      };
-      document.head.appendChild(script);
     }
 
     // Contact Form Handler
@@ -1068,7 +951,7 @@
       });
     }
 
-    loadGoogleMapsPlaces();
+    loadReviews();
   });
 
   </script>
