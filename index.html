@@ -51,6 +51,21 @@
     }
     header h1 { font-size: 2.2rem; letter-spacing: 0.03em; }
     header p  { font-size: 1rem; opacity: 0.85; margin-top: 0.4rem; }
+    .header-contact {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem 1rem;
+    }
+    .header-contact a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .header-contact a:hover { text-decoration: underline; }
 
     /* --- Main content wrapper --- */
     main {
@@ -548,6 +563,13 @@
   <header>
     <h1>Lin's Acupuncture Clinic</h1>
     <p>Traditional Chinese Medicine · Saskatoon, SK</p>
+    <div class="header-contact" aria-label="Clinic contact information">
+      <a href="tel:3062220134">306-222-0134</a>
+      <span aria-hidden="true">|</span>
+      <a href="tel:3065002223">306-500-2223</a>
+      <span aria-hidden="true">|</span>
+      <a href="mailto:lin5002223@gmail.com">lin5002223@gmail.com</a>
+    </div>
   </header>
 
   <main>
