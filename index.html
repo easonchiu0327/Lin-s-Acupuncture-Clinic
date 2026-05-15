@@ -260,6 +260,23 @@
       font-size: 0.92rem;
       margin-bottom: 1rem;
     }
+    .review-note {
+      color: var(--color-muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .about-emphasis {
+      margin-top: 1.2rem;
+      padding: 1rem 1.1rem;
+      background: #f4f8f4;
+      border-left: 4px solid var(--color-accent);
+      border-radius: 6px;
+    }
+    .about-emphasis p {
+      margin: 0.35rem 0;
+      font-size: 1.02rem;
+    }
 
     /* ============================================================
        PROCEDURE TAGS  (pill badges for the list of conditions)
@@ -606,6 +623,30 @@
             Lin's acupuncture clinic has been established in Saskatoon since 2015.
           </p>
 
+          <h3>Recent Reviews</h3>
+          <p class="review-note">Live Google review snapshot for Lin's Acupuncture Clinic.</p>
+
+          <div id="about-reviews-summary" class="review-summary">
+            <div class="review-loading">Loading latest Google rating and reviews...</div>
+          </div>
+
+          <div id="about-reviews-list"></div>
+
+          <p id="about-reviews-error" class="review-error" hidden>
+            Unable to load live Google reviews at the moment.
+          </p>
+
+          <p>
+            <a class="review-source-link" href="https://threebestrated.ca/acupuncture-in-saskatoon-sk" target="_blank" rel="noopener">
+              The Best Acupuncture in Saskatoon, SK
+            </a>
+          </p>
+
+          <div class="about-emphasis">
+            <p><strong>Call Us Today for FREE Consultations</strong></p>
+            <p><strong>We accept Direct billing, SGI and most insurance companies cover the acupuncture treatment.</strong></p>
+          </div>
+
         </div>
       </section>
 
@@ -816,12 +857,23 @@
 
     const googlePlaceUrl = 'https://maps.app.goo.gl/6SBhaCg7c8teawhi9';
     const placeTextQuery = "Lin's Acupuncture Clinic Saskatoon";
-    const maxReviews = 3;
+    const maxReviews = 5;
     const apiKey = (window.LIN_CLINIC_GOOGLE_MAPS_KEY || '').trim();
 
-    const summaryEl = document.getElementById('reviews-summary');
-    const listEl = document.getElementById('reviews-list');
-    const errorEl = document.getElementById('reviews-error');
+    const reviewTargets = [
+      {
+        summaryEl: document.getElementById('reviews-summary'),
+        listEl: document.getElementById('reviews-list'),
+        errorEl: document.getElementById('reviews-error')
+      },
+      {
+        summaryEl: document.getElementById('about-reviews-summary'),
+        listEl: document.getElementById('about-reviews-list'),
+        errorEl: document.getElementById('about-reviews-error')
+      }
+    ].filter(function(target) {
+      return target.summaryEl && target.listEl && target.errorEl;
+    });
 
     function toStarText(score) {
       const rounded = Math.round(Number(score) || 0);
@@ -837,21 +889,21 @@
         .replaceAll("'", '&#39;');
     }
 
-    function renderReviewSummary(rating, total, sourceUrl) {
-      summaryEl.innerHTML = [
+    function renderReviewSummary(target, rating, total, sourceUrl) {
+      target.summaryEl.innerHTML = [
         '<strong>' + escapeHtml(Number(rating).toFixed(1)) + ' ' + toStarText(rating) + '</strong>',
         '<div>' + escapeHtml(String(total)) + ' total Google reviews</div>',
         '<a class="review-source-link" href="' + escapeHtml(sourceUrl) + '" target="_blank" rel="noopener">Read all reviews on Google Maps</a>'
       ].join('');
     }
 
-    function renderReviewCards(reviews) {
+    function renderReviewCards(target, reviews) {
       if (!reviews.length) {
-        listEl.innerHTML = '<p class="review-loading">No recent public reviews were returned.</p>';
+        target.listEl.innerHTML = '<p class="review-loading">No recent public reviews were returned.</p>';
         return;
       }
 
-      listEl.innerHTML = reviews.map(function(review) {
+      target.listEl.innerHTML = reviews.map(function(review) {
         const stars = toStarText(review.rating);
         const author = escapeHtml(review.author_name || 'Google Review');
         const text = escapeHtml(review.text || '');
@@ -866,18 +918,22 @@
       }).join('');
     }
 
-    function showError(message) {
-      if (message) errorEl.textContent = message;
-      errorEl.hidden = false;
+    function showError(target, message) {
+      if (message) target.errorEl.textContent = message;
+      target.errorEl.hidden = false;
     }
 
     function loadGoogleMapsPlaces() {
       if (!apiKey) {
-        summaryEl.innerHTML = [
-          '<strong>Google reviews are ready to connect.</strong>',
-          '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
-          '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
-        ].join('');
+        reviewTargets.forEach(function(target) {
+          target.summaryEl.innerHTML = [
+            '<strong>Google reviews are ready to connect.</strong>',
+            '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
+            '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
+          ].join('');
+          target.listEl.innerHTML = '';
+          target.errorEl.hidden = true;
+        });
         return;
       }
 
@@ -893,7 +949,9 @@
           },
           function(placeResults, placeStatus) {
             if (placeStatus !== google.maps.places.PlacesServiceStatus.OK || !placeResults || !placeResults.length) {
-              showError('Unable to find the clinic listing on Google Maps right now.');
+              reviewTargets.forEach(function(target) {
+                showError(target, 'Unable to find the clinic listing on Google Maps right now.');
+              });
               return;
             }
 
@@ -904,17 +962,25 @@
               },
               function(place, detailStatus) {
                 if (detailStatus !== google.maps.places.PlacesServiceStatus.OK || !place) {
-                  showError('Unable to load live Google reviews right now.');
+                  reviewTargets.forEach(function(target) {
+                    showError(target, 'Unable to load live Google reviews right now.');
+                  });
                   return;
                 }
 
                 const rating = Number(place.rating || 0);
                 const total = Number(place.user_ratings_total || 0);
                 const sourceUrl = place.url || googlePlaceUrl;
-                const reviews = Array.isArray(place.reviews) ? place.reviews.slice(0, maxReviews) : [];
+                const rawReviews = Array.isArray(place.reviews) ? place.reviews.slice() : [];
+                rawReviews.sort(function(a, b) {
+                  return (b.time || 0) - (a.time || 0);
+                });
+                const reviews = rawReviews.slice(0, maxReviews);
 
-                renderReviewSummary(rating, total, sourceUrl);
-                renderReviewCards(reviews);
+                reviewTargets.forEach(function(target) {
+                  renderReviewSummary(target, rating, total, sourceUrl);
+                  renderReviewCards(target, reviews);
+                });
               }
             );
           }
@@ -926,7 +992,9 @@
       script.async = true;
       script.defer = true;
       script.onerror = function() {
-        showError('Google Maps script failed to load. Please verify the API key and API restrictions.');
+        reviewTargets.forEach(function(target) {
+          showError(target, 'Google Maps script failed to load. Please verify the API key and API restrictions.');
+        });
       };
       document.head.appendChild(script);
     }
