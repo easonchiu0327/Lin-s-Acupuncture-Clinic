@@ -820,6 +820,8 @@
     const placeTextQuery = "Lin's Acupuncture Clinic Saskatoon";
     const maxReviews = 5;
     const apiKey = (window.LIN_CLINIC_GOOGLE_MAPS_KEY || '').trim();
+    const reviewCacheKey = 'linReviewsCacheV1';
+    const reviewCacheTTL = 24 * 60 * 60 * 1000;
 
     const reviewTargets = [
       {
@@ -835,6 +837,41 @@
     ].filter(function(target) {
       return target.summaryEl && target.listEl && target.errorEl;
     });
+
+    function getReviewCache() {
+      try {
+        const raw = localStorage.getItem(reviewCacheKey);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.timestamp || !parsed.data) return null;
+        return parsed;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function setReviewCache(data) {
+      try {
+        localStorage.setItem(reviewCacheKey, JSON.stringify({
+          timestamp: Date.now(),
+          data: data
+        }));
+      } catch (err) {
+        // Ignore cache errors (private mode, storage limits)
+      }
+    }
+
+    function scheduleNextRefresh(delayMs) {
+      if (!apiKey) return;
+      const delay = Math.max(delayMs || reviewCacheTTL, 0);
+      window.setTimeout(function() {
+        if (typeof window.initGoogleReviews === 'function') {
+          window.initGoogleReviews();
+        } else {
+          loadGoogleMapsPlaces();
+        }
+      }, delay);
+    }
 
     function toStarText(score) {
       const rounded = Math.round(Number(score) || 0);
@@ -884,17 +921,40 @@
       target.errorEl.hidden = false;
     }
 
+    function renderFromData(data) {
+      if (!data) return;
+      reviewTargets.forEach(function(target) {
+        renderReviewSummary(target, data.rating, data.total, data.sourceUrl);
+        renderReviewCards(target, data.reviews || []);
+      });
+    }
+
     function loadGoogleMapsPlaces() {
+      const cached = getReviewCache();
+      const cacheAge = cached ? (Date.now() - cached.timestamp) : null;
+      const cacheFresh = cached && cacheAge < reviewCacheTTL;
+
+      if (cached && cached.data) {
+        renderFromData(cached.data);
+      }
+
       if (!apiKey) {
-        reviewTargets.forEach(function(target) {
-          target.summaryEl.innerHTML = [
-            '<strong>Google reviews are ready to connect.</strong>',
-            '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
-            '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
-          ].join('');
-          target.listEl.innerHTML = '';
-          target.errorEl.hidden = true;
-        });
+        if (!cached) {
+          reviewTargets.forEach(function(target) {
+            target.summaryEl.innerHTML = [
+              '<strong>Google reviews are ready to connect.</strong>',
+              '<div>Set window.LIN_CLINIC_GOOGLE_MAPS_KEY from your environment config to show live stars, total review count, and recent reviews.</div>',
+              '<a class="review-source-link" href="' + googlePlaceUrl + '" target="_blank" rel="noopener">View reviews on Google Maps</a>'
+            ].join('');
+            target.listEl.innerHTML = '';
+            target.errorEl.hidden = true;
+          });
+        }
+        return;
+      }
+
+      if (cacheFresh) {
+        scheduleNextRefresh(reviewCacheTTL - cacheAge);
         return;
       }
 
@@ -937,11 +997,19 @@
                   return (b.time || 0) - (a.time || 0);
                 });
                 const reviews = rawReviews.slice(0, maxReviews);
+                const payload = {
+                  rating: rating,
+                  total: total,
+                  sourceUrl: sourceUrl,
+                  reviews: reviews
+                };
 
                 reviewTargets.forEach(function(target) {
-                  renderReviewSummary(target, rating, total, sourceUrl);
-                  renderReviewCards(target, reviews);
+                  renderReviewSummary(target, payload.rating, payload.total, payload.sourceUrl);
+                  renderReviewCards(target, payload.reviews);
                 });
+                setReviewCache(payload);
+                scheduleNextRefresh(reviewCacheTTL);
               }
             );
           }
