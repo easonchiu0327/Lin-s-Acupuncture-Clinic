@@ -577,11 +577,10 @@
     <!-- Tabs — show section buttons in a row; panels shown below -->
     <div class="tabs" role="tablist" aria-label="Site sections">
       <button id="tab-about" class="tab active" data-target="about" aria-selected="true" role="tab">About</button>
-      <button id="tab-procedures" class="tab" data-target="procedures" role="tab">Procedures</button>
       <button id="tab-what-is-acupuncture" class="tab" data-target="what-is-acupuncture" role="tab">What is acupuncture</button>
-      <button id="tab-reviews" class="tab" data-target="reviews" role="tab">Reviews</button>
-      <button id="tab-contact" class="tab" data-target="contact" role="tab">Contact</button>
+      <button id="tab-quit-smoking" class="tab" data-target="quit-smoking" role="tab">Quit Smoking</button>
       <button id="tab-faq" class="tab" data-target="faq" role="tab">FAQ</button>
+      <button id="tab-contact" class="tab" data-target="contact" role="tab">Contact</button>
     </div>
 
     <div class="tab-panels">
@@ -628,6 +627,8 @@
             Unable to load live Google reviews at the moment.
           </p>
 
+          <div id="google-places-host" style="width:1px; height:1px; overflow:hidden; position:absolute; left:-9999px;"></div>
+
           <p>
             <a class="review-source-link best-link" href="https://threebestrated.ca/acupuncture-in-saskatoon-sk" target="_blank" rel="noopener">
               The Best Acupuncture in Saskatoon, SK
@@ -638,48 +639,6 @@
             <p><strong>Call Us Today for FREE Consultations</strong></p>
             <p><strong>We accept Direct billing, SGI and most insurance companies cover the acupuncture treatment.</strong></p>
           </div>
-
-        </div>
-      </section>
-
-      <section id="procedures" class="tab-panel" role="tabpanel" aria-labelledby="tab-procedures">
-        <div class="section-body">
-
-          <h3>Treatments Offered</h3>
-          <ul>
-            <li>Acupuncture therapy</li>
-            <li>Electroacupuncture</li>
-            <li>Laser auricular acupuncture (smoking cessation)</li>
-            <li>Tui-na massage</li>
-            <li>Cupping therapy</li>
-            <li>Herbal medicine consultation</li>
-          </ul>
-
-          <h3>Conditions Treated</h3>
-          <div class="tag-list">
-            <span class="tag">Headaches &amp; Migraines</span>
-            <span class="tag">Neck &amp; Shoulder Pain</span>
-            <span class="tag">Back Pain</span>
-            <span class="tag">Sciatica</span>
-            <span class="tag">Frozen Shoulder</span>
-            <span class="tag">Smoking Cessation</span>
-            <span class="tag">Anxiety &amp; Depression</span>
-            <span class="tag">Insomnia</span>
-            <span class="tag">Weight Loss</span>
-            <span class="tag">Gynecological Issues</span>
-            <span class="tag">Digestive Disorders</span>
-            <span class="tag">Bell's Palsy</span>
-            <span class="tag">Post-Stroke Rehabilitation</span>
-            <span class="tag">Addiction Support</span>
-          </div>
-
-          <!-- Insurance note -->
-          <h3>Insurance &amp; Payment</h3>
-          <p>
-            We offer <strong>direct billing</strong>. SGI and most major insurance
-            providers cover acupuncture. Please contact us if you have questions
-            about your specific plan.
-          </p>
 
         </div>
       </section>
@@ -732,52 +691,10 @@
         </div>
       </section>
 
-      <section id="reviews" class="tab-panel" role="tabpanel" aria-labelledby="tab-reviews">
+      <section id="quit-smoking" class="tab-panel" role="tabpanel" aria-labelledby="tab-quit-smoking">
         <div class="section-body">
-
-          <p style="color: var(--color-muted); font-size:0.9rem; margin-bottom:1rem;">
-            Live Google review snapshot for Lin's Acupuncture Clinic.
-          </p>
-
-          <div id="reviews-summary" class="review-summary">
-            <div class="review-loading">Loading latest Google rating and reviews...</div>
-          </div>
-
-          <div id="reviews-list"></div>
-
-          <p id="reviews-error" class="review-error" hidden>
-            Unable to load live Google reviews at the moment.
-          </p>
-
-          <div id="google-places-host" style="width:1px; height:1px; overflow:hidden; position:absolute; left:-9999px;"></div>
-
-        </div>
-      </section>
-
-      <section id="contact" class="tab-panel" role="tabpanel" aria-labelledby="tab-contact">
-        <div class="section-body">
-
-          <h3>Send us a Message</h3>
-          <form id="contact-form" class="contact-form">
-            <div class="form-group">
-              <label for="name">Name</label>
-              <input type="text" id="name" name="name" required>
-            </div>
-
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email" name="email" required>
-            </div>
-
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" rows="6" required></textarea>
-            </div>
-
-            <button type="submit" class="btn-send">Send Email</button>
-            <div id="form-status" class="form-status"></div>
-          </form>
-
+          <h3>Quit Smoking</h3>
+          <p>Content coming soon.</p>
         </div>
       </section>
 
@@ -804,6 +721,57 @@
           <div class="faq-item">
             <h4>Can acupuncture sometimes be uncomfortable or painful?</h4>
             <p>Some people feel a little stinging when the needle goes in. However, once the needle is in, they feel very relaxed and comfortable. Many patients even fall asleep during the treatment.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <section id="contact" class="tab-panel" role="tabpanel" aria-labelledby="tab-contact">
+        <div class="section-body">
+          <h3>Contact</h3>
+          <div class="contact-grid">
+            <div class="contact-item">
+              <strong>Call</strong>
+              <a href="tel:3062220134">306-222-0134</a>
+            </div>
+            <div class="contact-item">
+              <strong>Text</strong>
+              <a href="sms:3065002223">306-500-2223</a>
+            </div>
+            <div class="contact-item">
+              <strong>Email</strong>
+              <a href="mailto:lin5002223@gmail.com">lin5002223@gmail.com</a>
+            </div>
+            <div class="contact-item">
+              <strong>Location</strong>
+              <span>1120 8 St E, Saskatoon, SK S7H 0S4</span>
+            </div>
+            <div class="contact-item">
+              <strong>Google Map</strong>
+              <a href="https://maps.app.goo.gl/vwyfss6aoBytnTpo6" target="_blank" rel="noopener">Open in Google Maps</a>
+            </div>
+          </div>
+
+          <div class="map-container">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2524.9523937547217!2d-106.67000732349122!3d52.13319907198755!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x530c3cd4b3f4f4f5%3A0x5a5a5a5a5a5a5a5a!2sLin's%20Acupuncture%20Clinic!5e0!3m2!1sen!2sca!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+
+          <h3>Operation Hour</h3>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr><th>Day</th><th>Hours</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Sunday</td><td>Closed</td></tr>
+                <tr><td>Monday</td><td>10:00 AM – 5:00 PM</td></tr>
+                <tr><td>Tuesday</td><td>10:00 AM – 5:00 PM</td></tr>
+                <tr><td>Wednesday</td><td>10:00 AM – 5:00 PM</td></tr>
+                <tr><td>Thursday</td><td>10:00 AM – 5:00 PM</td></tr>
+                <tr><td>Friday</td><td>10:00 AM – 5:00 PM</td></tr>
+                <tr><td>Saturday</td><td>10:00 AM – 5:00 PM</td></tr>
+              </tbody>
+            </table>
           </div>
 
         </div>
