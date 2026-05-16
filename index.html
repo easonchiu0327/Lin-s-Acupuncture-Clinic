@@ -508,6 +508,10 @@
         font-weight: bold;
         font-size: 0.95rem;
         min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
       }
       .mobile-action:active {
         transform: scale(0.98);
@@ -515,9 +519,11 @@
       .mobile-action-group {
         position: relative;
         flex: 1;
+        display: flex;
       }
       .mobile-action-group .mobile-action {
         width: 100%;
+        flex: 1;
       }
       .mobile-action-menu {
         position: absolute;
