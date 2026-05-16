@@ -326,6 +326,11 @@
       box-shadow: 0 8px 18px rgba(90, 122, 90, 0.22);
     }
     .best-link:active { transform: scale(0.98); }
+    .best-link::after {
+      content: '→';
+      margin-left: 0.45rem;
+      font-weight: bold;
+    }
 
     .about-emphasis {
       margin-top: 1.2rem;
@@ -444,7 +449,18 @@
         scroll-snap-type: x mandatory;
       }
       .tabs::-webkit-scrollbar { display: none; }
-      .tab { display: inline-block; min-width: 100px; padding: 0.65rem 0.9rem; font-size: 0.95rem; border-radius: 999px; scroll-snap-align: start; }
+      .tab {
+        display: inline-block;
+        min-width: 92px;
+        max-width: 140px;
+        padding: 0.55rem 0.7rem;
+        font-size: 0.9rem;
+        border-radius: 999px;
+        scroll-snap-align: start;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .tab:focus { outline: 3px solid rgba(143,188,143,0.18); }
       .tab-panels { padding: 0; }
       .tab-panel { padding: 1rem; }
@@ -462,7 +478,7 @@
     }
     @media (max-width: 420px) {
       header h1 { font-size: 1.3rem; }
-      .tab { min-width: 84px; padding: 0.55rem 0.75rem; font-size: 0.9rem; }
+      .tab { min-width: 82px; max-width: 120px; padding: 0.5rem 0.65rem; font-size: 0.86rem; }
     }
 
     /* --- Contact Form --- */
