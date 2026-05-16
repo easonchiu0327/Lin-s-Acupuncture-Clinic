@@ -458,18 +458,23 @@
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
       display: none;
     }
-    .mobile-action-menu a {
+    .mobile-action-menu button {
       display: block;
+      width: 100%;
       padding: 0.45rem 0.6rem;
       border-radius: 10px;
+      border: none;
       text-decoration: none;
       color: var(--color-primary);
       font-weight: bold;
       background: #f4f8f4;
       margin: 0.25rem 0;
       min-height: 40px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
     }
-    .mobile-action-menu a:hover { background: #e8f0e8; }
+    .mobile-action-menu button:hover { background: #e8f0e8; }
     .mobile-action-group.open .mobile-action-menu { display: block; }
 
     /* --- Mobile adjustments --- */
@@ -890,8 +895,8 @@
     <div class="mobile-action-group">
       <button class="mobile-action" type="button" aria-expanded="false" aria-controls="call-menu">Call</button>
       <div id="call-menu" class="mobile-action-menu" role="menu">
-        <a href="tel:3062220134" role="menuitem">Call 306-222-0134</a>
-        <a href="tel:3065002223" role="menuitem">Call 306-500-2223</a>
+        <button class="call-option" data-number="3062220134" role="menuitem">Call 306-222-0134</button>
+        <button class="call-option" data-number="3065002223" role="menuitem">Call 306-500-2223</button>
       </div>
     </div>
     <a class="mobile-action" href="sms:3062220134">Text</a>
@@ -1031,9 +1036,20 @@
     const callMenu = document.querySelector('.mobile-action-group');
     if (callMenu) {
       const callButton = callMenu.querySelector('button.mobile-action');
+      const callOptions = callMenu.querySelectorAll('.call-option');
+
       callButton.addEventListener('click', function() {
         const isOpen = callMenu.classList.toggle('open');
         callButton.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      callOptions.forEach(function(option) {
+        option.addEventListener('click', function() {
+          const number = this.getAttribute('data-number');
+          window.location.href = 'tel:' + number;
+          callMenu.classList.remove('open');
+          callButton.setAttribute('aria-expanded', 'false');
+        });
       });
 
       document.addEventListener('click', function(event) {
