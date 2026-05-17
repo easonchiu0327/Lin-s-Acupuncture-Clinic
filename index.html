@@ -1304,6 +1304,28 @@
             .replaceAll("'", "&#39;");
         }
 
+        function getRelativeTime(timestamp) {
+          if (!timestamp) return "";
+          const now = Date.now();
+          const reviewTime = Number(timestamp) * 1000; // Convert to milliseconds
+          const diffMs = now - reviewTime;
+          const diffSeconds = Math.floor(diffMs / 1000);
+          const diffMinutes = Math.floor(diffSeconds / 60);
+          const diffHours = Math.floor(diffMinutes / 60);
+          const diffDays = Math.floor(diffHours / 24);
+          const diffWeeks = Math.floor(diffDays / 7);
+          const diffMonths = Math.floor(diffDays / 30);
+          const diffYears = Math.floor(diffDays / 365);
+
+          if (diffSeconds < 60) return "just now";
+          if (diffMinutes < 60) return diffMinutes + (diffMinutes === 1 ? " minute ago" : " minutes ago");
+          if (diffHours < 24) return diffHours + (diffHours === 1 ? " hour ago" : " hours ago");
+          if (diffDays < 7) return diffDays + (diffDays === 1 ? " day ago" : " days ago");
+          if (diffWeeks < 4) return diffWeeks + (diffWeeks === 1 ? " week ago" : " weeks ago");
+          if (diffMonths < 12) return diffMonths + (diffMonths === 1 ? " month ago" : " months ago");
+          return diffYears + (diffYears === 1 ? " year ago" : " years ago");
+        }
+
         function renderReviewSummary(target, rating, total, sourceUrl) {
           target.summaryEl.innerHTML = [
             "<strong>" +
@@ -1330,14 +1352,17 @@
               const stars = toStarText(review.rating);
               const author = escapeHtml(review.author_name || "Google Review");
               const text = escapeHtml(review.text || "");
-              const relative = review.relative_time_description
-                ? " - " + escapeHtml(review.relative_time_description)
-                : "";
+              let timeDisplay = "";
+              if (review.relative_time_description) {
+                timeDisplay = " - " + escapeHtml(review.relative_time_description);
+              } else if (review.time) {
+                timeDisplay = " - " + getRelativeTime(review.time);
+              }
               return [
                 '<div class="review-card">',
                 '  <div class="stars">' + stars + "</div>",
                 '  <p>"' + text + '"</p>',
-                '  <div class="author">- ' + author + relative + "</div>",
+                '  <div class="author">- ' + author + timeDisplay + "</div>",
                 "</div>",
               ].join("");
             })
